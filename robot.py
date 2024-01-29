@@ -41,23 +41,25 @@ class BaseRobot(AbstractRobot):
 
   def next_plan(self, plan:str, observation: Dict[str, np.ndarray]) -> float:
     """ Returns the sleep time to be applied"""
-    # print plan
-    #print(f"\033[91m Task: {plan} \033[0m ")
     # if custom function is called apply that
+    print("plan is",plan)
     if "open" in plan.lower() and "gripper" in plan.lower():
       self.open_gripper()
       simulate_stream("OD", "\n```\n open_gripper()\n```\n")
-      #return 1.
+      return 1.
     elif "close" in plan.lower() and "gripper" in plan.lower():
       self.close_gripper()
       simulate_stream("OD", "\n```\n close_gripper()\n```\n")
-      #xsreturn 1.
+      return 1.
     # catch if reply cannot be parsed. i.e. when askin the LLM a question
     try:
+      print("runing plan")
       # design optimization functions
       optimization = self.OD.run(plan)
       # apply optimization functions to MPC
-      self.MPC.apply_gpt_message(optimization, observation)
+      print("applying")
+      self.MPC.apply_gpt_message(optimization, observation, self.gripper)
+      
       return self.cfg.wait_s
     except:
       return 1.

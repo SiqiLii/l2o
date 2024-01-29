@@ -11,6 +11,7 @@ from langchain.schema import HumanMessage, AIMessage
 from langchain.prompts.chat import SystemMessagePromptTemplate
 from langchain.output_parsers import PydanticOutputParser
 from langchain.callbacks.base import BaseCallbackHandler
+from openai import OpenAI
 
 
 TOKEN_ENCODER = tiktoken.encoding_for_model("gpt-4")
@@ -67,6 +68,69 @@ class StreamHandler(BaseCallbackHandler):
     self.container.markdown(pretty_text, unsafe_allow_html=False)
     session_state.messages.append({"type": self.avatar, "content": pretty_text})
 
+import re
+def preprocessing(content):
+  str_content=content
+  task_list=str_content.split('\n')
+  for item in task_list:
+      if len(item)<=2:
+          task_list.remove(item)
+  tasks=task_list[1:-1]
+  tasks_de_repeat=[]
+  for i,task in enumerate(tasks):
+    task=task.lower()
+    if 'repeat' in task:
+        range_pattern = r'\d+-\d+'
+
+        # Search for the pattern in the sentence
+        range_match = re.search(range_pattern, task)
+
+        # Extract the range if found
+        extracted_range = range_match.group() if range_match else None
+        if extracted_range==None:
+            start_index=1
+            end_index=i
+        else:
+            start_index=int(extracted_range.split('-')[0])
+            end_index=int(extracted_range.split('-')[1])
+
+        # Split the sentence by periods to isolate relevant part
+        parts = task.split('.')
+
+        # Find the part of the sentence that contains the word 'Repeat' or 'repeat'
+        relevant_part = next((part for part in parts if 'repeat' in part.lower()), None)
+
+        # If a relevant part is found, extract block names that follow 'Repeat'
+        if relevant_part:
+        # Regular expression to find the block names after 'Repeat'
+            block_pattern = r'block_\d+'
+            blocks_near_repeat = re.findall(block_pattern, relevant_part)
+        else:
+            blocks_near_repeat = []
+
+        repeat_tasks=[]
+        for task_ in tasks[start_index-1:end_index]:
+            block_pattern = r'block_\d+'
+            blocks_to_replace = re.findall(block_pattern, task_)
+            
+            try:
+                task_=task_.replace(blocks_to_replace[0],blocks_near_repeat[0])
+               
+            except:
+                pass
+            try:
+                task_=task_.replace(blocks_to_replace[1],blocks_near_repeat[1])
+              
+            except:
+                pass
+            repeat_tasks.append(task_)
+        
+        tasks_de_repeat=tasks_de_repeat+repeat_tasks
+        #repeate_tasks=[]
+    else:
+        tasks_de_repeat.append(task)
+  return tasks_de_repeat
+
 def simulate_stream(avatar:str, text:str, pretty_text:Optional[str]=None):
   """ Function used to simulate stream in case of harcoded GPT responses """
   placeholder = empty()
@@ -90,6 +154,7 @@ ParsingModel = {
   "objective": Objective,
   "optimization": Optimization
 }
+
 
 class BaseLLM(AbstractLLM):
 
@@ -122,5 +187,4 @@ class BaseLLM(AbstractLLM):
         pretty_text = ""
       simulate_stream(self.cfg.avatar, text, pretty_text)
     self.messages.append(model_message)
-    #print(f"\33[92m {model_message.content} \033[0m \n")
     return self.parser.parse(model_message.content)

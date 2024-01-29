@@ -1,11 +1,12 @@
 from core import AbstractControllerConfig, AbstractLLMConfig, AbstractRobotConfig, AbstractSimulaitonConfig
-from prompts.stack import *
+import sys
+from prompts import *
 
 
 class SimulationConfig(AbstractSimulaitonConfig):
   render: bool = True
-  env_name: str = "Cubes"     # [Cubes, CleanPlate, Sponge, MoveTable]
-  task: str = "L"  # [None, "stack", "pyramid", "L", "reverse", "clean_plate", "sponge", "move_table"]
+  env_name: str = "bridge"     # [Cubes, CleanPlate, Sponge, MoveTable,bridge,colorstack]
+  task: str = "bridge"  # [None, "stack", "pyramid", "L", "reverse", "clean_plate", "sponge", "move_table",bridge,colorstack]
   save_video: bool = False
   fps: int = 20 # only used if save_video = True
   dt: float = 0.05 # simulation timestep. Must be equal to that of controller
@@ -62,6 +63,7 @@ class NMPCOptimizationLLMConfig(AbstractLLMConfig):
 class BaseControllerConfig(AbstractControllerConfig):
   nx: int = 3
   nu: int = 3 
+  nrpy: int = 3
   T: int = 15
   dt: float = 0.1
   lu: float = -0.5 # lower bound on u
@@ -70,6 +72,7 @@ class BaseControllerConfig(AbstractControllerConfig):
 class BaseNMPCConfig(AbstractControllerConfig):
   nx: int = 3
   nu: int = 3 
+  nrpy: int = 3
   T: int = 15
   dt: float = 0.05
   lu: float = -0.2 # lower bound on u
@@ -86,7 +89,7 @@ class BaseRobotConfig(AbstractRobotConfig):
   od_type: str = "nmpc_optimization"          # Optimization Designer:  ["objective", "optimization"]
   controller_type: str = "optimization"  # Controller type:        ["objective", "optimization"]
   open_gripper_time: int = 15
-  wait_s: float = 30. # wait time after a new MPC formualtion is applied
+  wait_s: float = 45. # wait time after a new MPC formualtion is applied
 
 
 

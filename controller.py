@@ -89,6 +89,8 @@ class BaseController(AbstractController):
     lterm = 0.4*mterm
     # state objective
     self.mpc.set_objective(mterm=mterm, lterm=lterm)
+    print("mterm:", mterm)
+    print("lterm:", lterm)
     # input objective
     u_kwargs = {f'u{r["name"]}':1. for r in self.robots_info} | {f'u_psi{r["name"]}':1. for r in self.robots_info} 
     self.mpc.set_rterm(**u_kwargs)
@@ -154,8 +156,9 @@ class BaseController(AbstractController):
   def set_x0(self, observation: Dict[str, np.ndarray]):
     x0 = []
     self.pose = []
-    for r in self.robots_info: # TODO set names instead of robot_0 in panda
-      obs = observation[f'robot{r["name"]}'] # observation of each robot
+    for i,r in enumerate(self.robots_info): # TODO set names instead of robot_0 in panda
+      #obs = observation[f'robot{r["name"]}'] # observation of each robot
+      obs=observation[f'robot{r["name"]}']
       x = obs[:3]
       psi = np.array([obs[5]])
       dx = obs[6:9]
@@ -186,6 +189,7 @@ class BaseController(AbstractController):
     # put together variables for python code evaluation:    
     
     # initial state of robots before applying any action
+    print("observation is",observation)
     x0 = {f'x0{r["name"]}': observation[f'robot{r["name"]}'][:3] for r in self.robots_info} 
     # robot variable states (decision variables in the optimization problem)
     robots_states = {}
@@ -211,6 +215,7 @@ class BaseController(AbstractController):
       gamma_rotation = [-self.pose[i][4] * 1.5]  # P control for angle around y axis # TODO: 1. is a hardcoded gain
       psi_rotation = [u0[4*i+3]]            # rotation control
       action.append(np.concatenate((ee_displacement, theta_rotation, gamma_rotation, psi_rotation)))
+      #print("action:", action)
     
     return action
 
@@ -227,8 +232,10 @@ class ObjectiveController(BaseController):
     self.init_mpc()
     # apply constraint function
     self.set_objective(self._eval(objective.objective, observation))
+    print("set objective!!")
     # set base constraint functions
     self.set_constraints()
+    print("set constraints!!")
     # setup
     self.mpc.setup()
     self.mpc.set_initial_guess()
@@ -236,7 +243,7 @@ class ObjectiveController(BaseController):
 
 class OptimizationController(BaseController):
 
-  def apply_gpt_message(self, optimization: Optimization, observation: Dict[str, np.ndarray]) -> None:
+  def apply_gpt_message(self, optimization: Optimization, observation: Dict[str, np.ndarray],gripper_flag) -> None:
     # init mpc newly
     self.init_mpc()
     # apply constraint function
@@ -264,5 +271,3 @@ ControllerOptions = {
   "objective": ObjectiveController,
   "optimization": OptimizationController
 }
-
-
