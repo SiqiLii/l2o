@@ -47,11 +47,11 @@ class BaseRobot(AbstractRobot):
     if "open" in plan.lower() and "gripper" in plan.lower():
       self.open_gripper()
       simulate_stream("OD", "\n```\n open_gripper()\n```\n")
-      return 1.
+      #return 1.
     elif "close" in plan.lower() and "gripper" in plan.lower():
       self.close_gripper()
       simulate_stream("OD", "\n```\n close_gripper()\n```\n")
-      return 1.
+      #xsreturn 1.
     # catch if reply cannot be parsed. i.e. when askin the LLM a question
     try:
       # design optimization functions
