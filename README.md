@@ -6,6 +6,9 @@ https://github.com/vateseif/l2o/assets/45405956/4c9b84e3-fd7d-4159-903d-23285202
 
 
 ## Setup
+~~~
+git submodule update --init environments/panda-gym
+~~~
 ### Env
 Create the conda env
 ~~~
