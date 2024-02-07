@@ -4,8 +4,10 @@ from typing import List
 from abc import abstractmethod
 
 import gym
+import gymnasium
 import numpy as np
 import sys
+import panda_gym
 #from environments.bridge_env import MyRobotTaskEnv
 #from environments.colorstack_env import MyRobotTaskEnv
 
@@ -111,7 +113,7 @@ class AbstractSimulation(ObjBase):
   def __init__(self, cfg: AbstractSimulaitonConfig) -> None:
     self.cfg = cfg
     # init env
-    self.env = gym.make(f"Panda{cfg.env_name}-v3", render=cfg.render)
+    self.env = gymnasium.make(f"Panda{cfg.env_name}-v3", render_mode="rgb_array")
     #self.env = MyRobotTaskEnv(render_mode="rgb_array")
     # init robots
     self.robot: AbstractRobot # TODO: account for multiple robots

@@ -65,7 +65,7 @@ class Simulation(AbstractSimulation):
     # compute action
     action = self.robot.step() # TODO: this is a list because the env may have multiple robots
     # apply action
-    self.observation, _, done, _ = self.env.step(action)
+    self.observation, _, done, _ ,_= self.env.step(action)
     # store RGB frames if wanna save video
     if self.save_video:
       frame = self.env.render("rgb_array")
