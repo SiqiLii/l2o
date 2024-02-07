@@ -1,0 +1,5 @@
+Bridge:move the 3 cubes on the table as a line. The block_1 should be first moved to x=0.06, y=0.3, z=0.03. The 3 cubes are placed with one side length gap between two neighbor cubes. 
+Then place two cuboids on top of block_1 and block_2, block_2 and block_3 respectively (with y position of cuboids aligns with y position of cubes) to form as a bridge
+
+
+ColorStack:stack cubes with same colors together. Smaller cube on top of Larger Cube
