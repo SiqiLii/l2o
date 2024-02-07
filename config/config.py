@@ -1,11 +1,11 @@
 from core import AbstractControllerConfig, AbstractLLMConfig, AbstractRobotConfig, AbstractSimulaitonConfig
 import sys
-from prompts import *
+from prompts.prompts import *
 
 
 class SimulationConfig(AbstractSimulaitonConfig):
   render: bool = True
-  env_name: str = "bridge"     # [Cubes, CleanPlate, Sponge, MoveTable,bridge,colorstack]
+  env_name: str = "Bridge"     # [Cubes, CleanPlate, Sponge, MoveTable,Bridge,ColorStack]
   task: str = "bridge"  # [None, "stack", "pyramid", "L", "reverse", "clean_plate", "sponge", "move_table",bridge,colorstack]
   save_video: bool = False
   fps: int = 20 # only used if save_video = True
